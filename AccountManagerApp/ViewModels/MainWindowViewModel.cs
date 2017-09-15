@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
+// TODO: 未保存の変更がある状態でウィンドウを閉じようとした場合に確認メッセージを表示する。
+
 namespace AccountManagerApp
 {
     /// <summary>
