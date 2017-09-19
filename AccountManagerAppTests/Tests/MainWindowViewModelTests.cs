@@ -498,5 +498,84 @@ namespace AccountManagerApp.Tests
             Assert.AreSame(account2, _accountManager.AccountList[0]);
         }
 
+        [TestMethod]
+        public void 未保存の変更がある場合にウィンドウを閉じようとすると確認メッセージが表示される()
+        {
+            Account account1 = new Account()
+            {
+                AccountName = "a",
+                UserId = "b",
+                Password = "c",
+                Url = "d",
+                Remarks = "e",
+            };
+
+            _accountManager.RegisterAccount(account1);
+            Assert.IsTrue(_mainWindowViewModel.HasUnsavedChanges);
+
+            bool allowClose = _mainWindowViewModel.OnWindowClosing();
+
+            Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
+            Assert.AreSame(_mainWindowViewModel, _windowManager.ShowConfirmationParamViewModel);
+            Assert.AreEqual(Messages.ConfirmToQuitWhenHavingUnsavedChanges, _windowManager.ShowConfirmationParamMessage);
+        }
+
+        [TestMethod]
+        public void 未保存の変更が無い場合にウィンドウを閉じようとしても確認メッセージは表示されない()
+        {
+            Assert.IsFalse(_mainWindowViewModel.HasUnsavedChanges);
+
+            bool allowClose = _mainWindowViewModel.OnWindowClosing();
+
+            Assert.IsFalse(_windowManager.IsShowConfirmationCalled);
+            Assert.IsTrue(allowClose);
+        }
+
+        [TestMethod]
+        public void 未保存の変更がある場合にウィンドウを閉じようとした際の確認メッセージでOKを選択するとウィンドウが閉じる()
+        {
+            Account account1 = new Account()
+            {
+                AccountName = "a",
+                UserId = "b",
+                Password = "c",
+                Url = "d",
+                Remarks = "e",
+            };
+
+            _accountManager.RegisterAccount(account1);
+            Assert.IsTrue(_mainWindowViewModel.HasUnsavedChanges);
+
+            _windowManager.ShowConfirmationReturnValue = true;
+
+            bool allowClose = _mainWindowViewModel.OnWindowClosing();
+
+            Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
+            Assert.IsTrue(allowClose);
+        }
+
+        [TestMethod]
+        public void 未保存の変更がある場合にウィンドウを閉じようとした際の確認メッセージでキャンセルを選択するとウィンドウは閉じない()
+        {
+            Account account1 = new Account()
+            {
+                AccountName = "a",
+                UserId = "b",
+                Password = "c",
+                Url = "d",
+                Remarks = "e",
+            };
+
+            _accountManager.RegisterAccount(account1);
+            Assert.IsTrue(_mainWindowViewModel.HasUnsavedChanges);
+
+            _windowManager.ShowConfirmationReturnValue = false;
+
+            bool allowClose = _mainWindowViewModel.OnWindowClosing();
+
+            Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
+            Assert.IsFalse(allowClose);
+        }
+
     }
 }

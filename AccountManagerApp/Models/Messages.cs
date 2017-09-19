@@ -15,5 +15,11 @@
         /// </summary>
         public const string FailedToLoadAccounts = "Failed to load accounts.";
 
+        /// <summary>
+        /// 未保存の変更がある場合の終了確認。
+        /// </summary>
+        public const string ConfirmToQuitWhenHavingUnsavedChanges = "There are some unsaved changes.\n"
+            + "Do you really want to quit without saving your changes?";
+
     }
 }

@@ -47,5 +47,18 @@
         /// </remarks>
         void ShowError(ViewModel viewModel, string message);
 
+        /// <summary>
+        /// 確認メッセージを表示する。
+        /// </summary>
+        /// <param name="viewModel">確認メッセージを表示するビューモデル(null指定可)</param>
+        /// <param name="message">確認メッセージ(null指定不可)</param>
+        /// <returns>返答がOKだった場合はtrue、それ以外の場合はfalse</returns>
+        /// <remarks>
+        /// <para>このメソッドは確認メッセージが返答されるまで制御を返さない。</para>
+        /// <para><paramref name="viewModel"/>に関連付いたウィンドウが無い場合は何もしない。</para>
+        /// <para><paramref name="viewModel"/>にnullを指定した場合は親ウィンドウ無しでメッセージを表示する。</para>
+        /// </remarks>
+        bool ShowConfirmation(ViewModel viewModel, string message);
+
     }
 }

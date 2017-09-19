@@ -154,5 +154,37 @@ namespace AccountManagerApp
             }
         }
 
+        /// <summary>
+        /// <see cref="WindowManager.ShowConfirmation(ViewModel, string)"/>の実装。
+        /// </summary>
+        public bool ShowConfirmation(ViewModel viewModel, string message)
+        {
+            Utilities.RejectNull(message, nameof(message));
+
+            bool isOk = false;
+
+            if (viewModel == null)
+            {
+                MessageBoxResult messageBoxResult = MessageBox.Show(message, MessageBoxTitle, MessageBoxButton.OKCancel, MessageBoxImage.Question);
+
+                if (messageBoxResult == MessageBoxResult.OK)
+                {
+                    isOk = true;
+                }
+            }
+            else if (_windowMap.ContainsKey(viewModel))
+            {
+                Window window = _windowMap[viewModel];
+                MessageBoxResult messageBoxResult = MessageBox.Show(window, message, MessageBoxTitle, MessageBoxButton.OKCancel, MessageBoxImage.Question);
+
+                if (messageBoxResult == MessageBoxResult.OK)
+                {
+                    isOk = true;
+                }
+            }
+
+            return isOk;
+        }
+
     }
 }
