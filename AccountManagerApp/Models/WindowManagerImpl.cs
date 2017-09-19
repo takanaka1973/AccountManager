@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 
 namespace AccountManagerApp
@@ -64,6 +65,7 @@ namespace AccountManagerApp
 
         private void ShowWindow(Window window, ViewModel viewModel)
         {
+            window.Closing += Window_Closing;
             window.Closed += Window_Closed;
             window.DataContext = viewModel;
 
@@ -74,6 +76,7 @@ namespace AccountManagerApp
 
         private void ShowDialog(Window window, ViewModel viewModel, ViewModel parentViewModel)
         {
+            window.Closing += Window_Closing;
             window.Closed += Window_Closed;
             window.DataContext = viewModel;
 
@@ -102,11 +105,28 @@ namespace AccountManagerApp
             }
         }
 
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            Window window = (Window)sender;
+            ViewModel viewModel = (ViewModel)window.DataContext;
+
+            if (_windowMap.ContainsKey(viewModel))
+            {
+                bool allowClose = viewModel.OnWindowClosing();
+
+                if (!allowClose)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
+
         private void Window_Closed(object sender, EventArgs e)
         {
             Window window = (Window)sender;
             ViewModel viewModel = (ViewModel)window.DataContext;
 
+            window.Closing -= Window_Closing;
             window.Closed -= Window_Closed;
 
             if (_windowMap.ContainsKey(viewModel))
