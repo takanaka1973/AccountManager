@@ -14,6 +14,11 @@
         public ViewModel ShowErrorParamViewModel { get; private set; }
         public string ShowErrorParamMessage { get; private set; }
 
+        public bool IsShowConfirmationCalled { get; private set; }
+        public ViewModel ShowConfirmationParamViewModel { get; private set; }
+        public string ShowConfirmationParamMessage { get; private set; }
+        public bool ShowConfirmationReturnValue { get; set; }
+
         public WindowManagerMock()
         {
             Clear();
@@ -32,6 +37,11 @@
             IsShowErrorCalled = false;
             ShowErrorParamViewModel = null;
             ShowErrorParamMessage = null;
+
+            IsShowConfirmationCalled = false;
+            ShowConfirmationParamViewModel = null;
+            ShowConfirmationParamMessage = null;
+            ShowConfirmationReturnValue = false;
         }
 
         public void ShowMainWindow(AccountManager accountManager)
@@ -60,6 +70,15 @@
             IsShowErrorCalled = true;
             ShowErrorParamViewModel = viewModel;
             ShowErrorParamMessage = message;
+        }
+
+        public bool ShowConfirmation(ViewModel viewModel, string message)
+        {
+            IsShowConfirmationCalled = true;
+            ShowConfirmationParamViewModel = viewModel;
+            ShowConfirmationParamMessage = message;
+
+            return ShowConfirmationReturnValue;
         }
 
     }

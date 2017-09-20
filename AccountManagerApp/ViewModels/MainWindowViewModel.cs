@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-// TODO: 未保存の変更がある状態でウィンドウを閉じようとした場合に確認メッセージを表示する。
-
 namespace AccountManagerApp
 {
     /// <summary>
@@ -201,6 +199,24 @@ namespace AccountManagerApp
             {
                 _windowManager.ShowError(this, Messages.FailedToSaveAccounts);
             }
+        }
+
+        /// <summary>
+        /// <see cref="ViewModel.OnWindowClosing"/>の実装。
+        /// </summary>
+        public bool OnWindowClosing()
+        {
+            bool allowClose = true;
+
+            if (HasUnsavedChanges)
+            {
+                if (!_windowManager.ShowConfirmation(this, Messages.ConfirmToQuitWhenHavingUnsavedChanges))
+                {
+                    allowClose = false;
+                }
+            }
+
+            return allowClose;
         }
 
         /// <summary>

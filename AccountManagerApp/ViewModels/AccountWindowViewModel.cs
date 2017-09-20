@@ -148,6 +148,14 @@ namespace AccountManagerApp
         }
 
         /// <summary>
+        /// <see cref="ViewModel.OnWindowClosing"/>の実装。
+        /// </summary>
+        public bool OnWindowClosing()
+        {
+            return true;
+        }
+
+        /// <summary>
         /// <see cref="ViewModel.OnWindowClosed"/>の実装。
         /// </summary>
         public void OnWindowClosed()
