@@ -21,5 +21,10 @@
         public const string ConfirmToQuitWhenHavingUnsavedChanges = "There are some unsaved changes.\n"
             + "Do you really want to quit without saving your changes?";
 
+        /// <summary>
+        /// アカウントの削除確認。
+        /// </summary>
+        public const string ConfirmToDeleteAccount = "Do you really want to delete this account?";
+
     }
 }
