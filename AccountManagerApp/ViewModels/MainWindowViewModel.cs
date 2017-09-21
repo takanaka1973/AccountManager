@@ -175,7 +175,10 @@ namespace AccountManagerApp
         {
             if (_selectedAccount != null)
             {
-                _accountManager.RemoveAccount(_selectedAccount);
+                if (_windowManager.ShowConfirmation(this, Messages.ConfirmToDeleteAccount))
+                {
+                    _accountManager.RemoveAccount(_selectedAccount);
+                }
             }
         }
 

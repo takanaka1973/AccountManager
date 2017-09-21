@@ -492,6 +492,8 @@ namespace AccountManagerApp.Tests
             _mainWindowViewModel.SelectedAccount = account1;
             Assert.IsTrue(deleteAccountCommand.CanExecute(null));
 
+            _windowManager.ShowConfirmationReturnValue = true;
+
             deleteAccountCommand.Execute(null);
 
             Assert.AreEqual(1, _accountManager.AccountList.Count);
@@ -575,6 +577,86 @@ namespace AccountManagerApp.Tests
 
             Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
             Assert.IsFalse(allowClose);
+        }
+
+        [TestMethod]
+        public void アカウントを削除しようとした際に確認メッセージが表示される()
+        {
+            ICommand deleteAccountCommand = _mainWindowViewModel.DeleteAccountCommand;
+
+            Account account1 = new Account()
+            {
+                AccountName = "a",
+                UserId = "b",
+                Password = "c",
+                Url = "d",
+                Remarks = "e",
+            };
+
+            _accountManager.RegisterAccount(account1);
+
+            _mainWindowViewModel.SelectedAccount = account1;
+            Assert.IsTrue(deleteAccountCommand.CanExecute(null));
+
+            deleteAccountCommand.Execute(null);
+
+            Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
+            Assert.AreSame(_mainWindowViewModel, _windowManager.ShowConfirmationParamViewModel);
+            Assert.AreEqual(Messages.ConfirmToDeleteAccount, _windowManager.ShowConfirmationParamMessage);
+        }
+
+        [TestMethod]
+        public void アカウントを削除しようとした際の確認メッセージでOKを選択するとアカウントが削除される()
+        {
+            ICommand deleteAccountCommand = _mainWindowViewModel.DeleteAccountCommand;
+
+            Account account1 = new Account()
+            {
+                AccountName = "a",
+                UserId = "b",
+                Password = "c",
+                Url = "d",
+                Remarks = "e",
+            };
+
+            _accountManager.RegisterAccount(account1);
+            Assert.AreEqual(1, _accountManager.AccountList.Count);
+
+            _mainWindowViewModel.SelectedAccount = account1;
+            Assert.IsTrue(deleteAccountCommand.CanExecute(null));
+
+            _windowManager.ShowConfirmationReturnValue = true;
+
+            deleteAccountCommand.Execute(null);
+            Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
+            Assert.AreEqual(0, _accountManager.AccountList.Count);
+        }
+
+        [TestMethod]
+        public void アカウントを削除しようとした際の確認メッセージでキャンセルを選択するとアカウントは削除されない()
+        {
+            ICommand deleteAccountCommand = _mainWindowViewModel.DeleteAccountCommand;
+
+            Account account1 = new Account()
+            {
+                AccountName = "a",
+                UserId = "b",
+                Password = "c",
+                Url = "d",
+                Remarks = "e",
+            };
+
+            _accountManager.RegisterAccount(account1);
+            Assert.AreEqual(1, _accountManager.AccountList.Count);
+
+            _mainWindowViewModel.SelectedAccount = account1;
+            Assert.IsTrue(deleteAccountCommand.CanExecute(null));
+
+            _windowManager.ShowConfirmationReturnValue = false;
+
+            deleteAccountCommand.Execute(null);
+            Assert.IsTrue(_windowManager.IsShowConfirmationCalled);
+            Assert.AreEqual(1, _accountManager.AccountList.Count);
         }
 
     }
