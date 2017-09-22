@@ -45,15 +45,15 @@ namespace AccountManagerApp.Tests
         }
 
         [TestMethod]
-        public void targetAccountのAccountNameが空文字列でない場合はFinishCommandのCanExecuteの初期値はtrue()
+        public void targetAccountのAccountNameが空文字列でない場合のFinishCommandのCanExecuteの初期値はfalse()
         {
             Assert.AreNotEqual("", _targetAccount.AccountName);
 
-            Assert.IsTrue(_editAccountWindowViewModel.FinishCommand.CanExecute(null));
+            Assert.IsFalse(_editAccountWindowViewModel.FinishCommand.CanExecute(null));
         }
 
         [TestMethod]
-        public void targetAccountのAccountNameが空文字列の場合はFinishCommandのCanExecuteの初期値はfalse()
+        public void targetAccountのAccountNameが空文字列の場合のFinishCommandのCanExecuteの初期値はfalse()
         {
             var targetAccount1 = new Account()
             {
@@ -67,6 +67,113 @@ namespace AccountManagerApp.Tests
             var editAccountWindowViewModel1 = new EditAccountWindowViewModel(_windowManager, _accountManager, targetAccount1);
 
             Assert.IsFalse(editAccountWindowViewModel1.FinishCommand.CanExecute(null));
+        }
+
+        [TestMethod]
+        public void 編集対象アカウントと異なる点がある場合はFinishCommandのCanExecuteはtrueを返す()
+        {
+            ICommand finishCommand = _editAccountWindowViewModel.FinishCommand;
+            Account editingAccount = _editAccountWindowViewModel.EditingAccount;
+
+            Assert.IsFalse(finishCommand.CanExecute(null));
+
+            editingAccount.AccountName = "v";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.AccountName = _targetAccount.AccountName;
+            editingAccount.UserId = "w";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.UserId = _targetAccount.UserId;
+            editingAccount.Password = "x";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.Password = _targetAccount.Password;
+            editingAccount.Url = "y";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.Url = _targetAccount.Url;
+            editingAccount.Remarks = "z";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.Remarks = _targetAccount.Remarks;
+            Assert.IsFalse(finishCommand.CanExecute(null));
+        }
+
+        [TestMethod]
+        public void 編集対象アカウントと異なる点があってもAccountNameが空文字列の場合はFinishCommandのCanExecuteはfalseを返す()
+        {
+            ICommand finishCommand = _editAccountWindowViewModel.FinishCommand;
+            Account editingAccount = _editAccountWindowViewModel.EditingAccount;
+
+            editingAccount.AccountName = "v";
+            editingAccount.UserId = "w";
+            editingAccount.Password = "x";
+            editingAccount.Url = "y";
+            editingAccount.Remarks = "z";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.AccountName = "";
+            Assert.IsFalse(finishCommand.CanExecute(null));
+        }
+
+        [TestMethod]
+        public void 編集対象アカウントと異なる点が無い場合はFinishCommandのCanExecuteはfalseを返す()
+        {
+            ICommand finishCommand = _editAccountWindowViewModel.FinishCommand;
+            Account editingAccount = _editAccountWindowViewModel.EditingAccount;
+
+            editingAccount.AccountName = "v";
+            editingAccount.UserId = "w";
+            editingAccount.Password = "x";
+            editingAccount.Url = "y";
+            editingAccount.Remarks = "z";
+
+            Assert.IsTrue(finishCommand.CanExecute(null));
+
+            editingAccount.AccountName = _targetAccount.AccountName;
+            editingAccount.UserId = _targetAccount.UserId;
+            editingAccount.Password = _targetAccount.Password;
+            editingAccount.Url = _targetAccount.Url;
+            editingAccount.Remarks = _targetAccount.Remarks;
+
+            Assert.IsFalse(finishCommand.CanExecute(null));
+        }
+
+        [TestMethod]
+        public void FinishCommandのCanExecuteの戻り値が変わる場合のみCanExecuteChangedイベントが発火される()
+        {
+            ICommand finishCommand = _editAccountWindowViewModel.FinishCommand;
+            Account editingAccount = _editAccountWindowViewModel.EditingAccount;
+
+            Assert.IsFalse(finishCommand.CanExecute(null));
+
+            bool eventFired = false;
+
+            finishCommand.CanExecuteChanged += (sender, e) =>
+            {
+                eventFired = true;
+            };
+
+            editingAccount.AccountName = "v";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+            Assert.IsTrue(eventFired);
+
+            eventFired = false;
+            editingAccount.UserId = "w";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+            Assert.IsFalse(eventFired);
+
+            eventFired = false;
+            editingAccount.AccountName = _targetAccount.AccountName;
+            editingAccount.UserId = _targetAccount.UserId;
+            Assert.IsFalse(finishCommand.CanExecute(null));
+            Assert.IsTrue(eventFired);
+
+            eventFired = false;
+            editingAccount.AccountName = "";
+            Assert.IsFalse(finishCommand.CanExecute(null));
+            Assert.IsFalse(eventFired);
         }
 
         [TestMethod]
@@ -98,35 +205,6 @@ namespace AccountManagerApp.Tests
             Assert.AreEqual(editingAccount.Remarks, _targetAccount.Remarks);
 
             Assert.AreNotSame(editingAccount, _targetAccount);
-        }
-
-        [TestMethod]
-        public void AccountNameが空文字列の場合はFinishCommandを実行してもtargetAccountは更新されない()
-        {
-            ICommand finishCommand = _editAccountWindowViewModel.FinishCommand;
-            Account editingAccount = _editAccountWindowViewModel.EditingAccount;
-
-            editingAccount.AccountName = "";
-            editingAccount.UserId = "w";
-            editingAccount.Password = "x";
-            editingAccount.Url = "y";
-            editingAccount.Remarks = "z";
-
-            Assert.IsFalse(finishCommand.CanExecute(null));
-
-            Assert.AreNotEqual(editingAccount.AccountName, _targetAccount.AccountName);
-            Assert.AreNotEqual(editingAccount.UserId, _targetAccount.UserId);
-            Assert.AreNotEqual(editingAccount.Password, _targetAccount.Password);
-            Assert.AreNotEqual(editingAccount.Url, _targetAccount.Url);
-            Assert.AreNotEqual(editingAccount.Remarks, _targetAccount.Remarks);
-
-            finishCommand.Execute(null);
-
-            Assert.AreNotEqual(editingAccount.AccountName, _targetAccount.AccountName);
-            Assert.AreNotEqual(editingAccount.UserId, _targetAccount.UserId);
-            Assert.AreNotEqual(editingAccount.Password, _targetAccount.Password);
-            Assert.AreNotEqual(editingAccount.Url, _targetAccount.Url);
-            Assert.AreNotEqual(editingAccount.Remarks, _targetAccount.Remarks);
         }
 
     }

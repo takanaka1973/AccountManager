@@ -26,6 +26,24 @@
         }
 
         /// <summary>
+        /// <see cref="AccountWindowViewModel.CanFinish(Account, Account)"/>の実装。
+        /// </summary>
+        protected override bool CanFinish(Account targetAccount, Account editingAccount)
+        {
+            if (editingAccount.AccountName == "")
+            {
+                return false;
+            }
+
+            if (editingAccount.Equals(targetAccount))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// <see cref="AccountWindowViewModel.DoFinish(AccountManager, Account, Account)"/>の実装。
         /// </summary>
         protected override void DoFinish(AccountManager accountManager, Account targetAccount, Account editingAccount)
