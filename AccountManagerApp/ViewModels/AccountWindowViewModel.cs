@@ -80,14 +80,7 @@ namespace AccountManagerApp
 
             _editingAccount.PropertyChanged += EditingAccount_PropertyChanged;
 
-            if (_editingAccount.AccountName == "")
-            {
-                _canFinish = false;
-            }
-            else
-            {
-                _canFinish = true;
-            }
+            _canFinish = CanFinish(_targetAccount, _editingAccount);
 
             FinishCommand = new DelegateCommand(CanExecuteFinishCommand, ExecuteFinishCommand);
             CancelCommand = new DelegateCommand(null, ExecuteCancelCommand);
@@ -97,23 +90,12 @@ namespace AccountManagerApp
 
         private void EditingAccount_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(Account.AccountName))
+            bool oldCanFinish = _canFinish;
+            _canFinish = CanFinish(_targetAccount, _editingAccount);
+
+            if (_canFinish != oldCanFinish)
             {
-                bool oldCanFinish = _canFinish;
-
-                if (_editingAccount.AccountName == "")
-                {
-                    _canFinish = false;
-                }
-                else
-                {
-                    _canFinish = true;
-                }
-
-                if (_canFinish != oldCanFinish)
-                {
-                    FinishCommand.NotifyCanExecuteChanged();
-                }
+                FinishCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -129,6 +111,18 @@ namespace AccountManagerApp
                 DoFinish(_accountManager, _targetAccount, _editingAccount);
                 _windowManager.CloseWindow(this);
             }
+        }
+
+        /// <summary>
+        /// 編集完了が可能かどうかを取得する。
+        /// </summary>
+        /// <param name="targetAccount">編集対象のアカウント(新規アカウント作成の場合のみnull)</param>
+        /// <param name="editingAccount">編集中のアカウント(not null)</param>
+        /// <returns>編集完了が可能な場合はtrue、そうでない場合はfalse</returns>
+        /// <remarks>サブクラスでオーバライドして判定を行うこと。</remarks>
+        protected virtual bool CanFinish(Account targetAccount, Account editingAccount)
+        {
+            return true;
         }
 
         /// <summary>

@@ -61,10 +61,8 @@ namespace AccountManagerApp.Tests
         }
 
         [TestMethod]
-        public void AccountNameが空文字列の場合はFinishCommandを実行してもアカウントは登録されない()
+        public void AccountNameが空文字列の場合はFinishCommandのCanExecuteはfalseを返す()
         {
-            Assert.AreEqual(0, _accountManager.AccountList.Count);
-
             ICommand finishCommand = _newAccountWindowViewModel.FinishCommand;
             Account editingAccount = _newAccountWindowViewModel.EditingAccount;
 
@@ -75,10 +73,56 @@ namespace AccountManagerApp.Tests
             editingAccount.Remarks = "e";
 
             Assert.IsFalse(finishCommand.CanExecute(null));
+        }
 
-            finishCommand.Execute(null);
+        [TestMethod]
+        public void AccountNameが空文字列でない場合はFinishCommandのCanExecuteはtrueを返す()
+        {
+            ICommand finishCommand = _newAccountWindowViewModel.FinishCommand;
+            Account editingAccount = _newAccountWindowViewModel.EditingAccount;
 
-            Assert.AreEqual(0, _accountManager.AccountList.Count);
+            editingAccount.AccountName = "a";
+            editingAccount.UserId = "";
+            editingAccount.Password = "";
+            editingAccount.Url = "";
+            editingAccount.Remarks = "";
+
+            Assert.IsTrue(finishCommand.CanExecute(null));
+        }
+
+        [TestMethod]
+        public void FinishCommandのCanExecuteの戻り値が変わる場合のみCanExecuteChangedイベントが発火される()
+        {
+            ICommand finishCommand = _newAccountWindowViewModel.FinishCommand;
+            Account editingAccount = _newAccountWindowViewModel.EditingAccount;
+
+            Assert.IsFalse(finishCommand.CanExecute(null));
+
+            bool eventFired = false;
+
+            finishCommand.CanExecuteChanged += (sender, e) =>
+            {
+                eventFired = true;
+            };
+
+            editingAccount.AccountName = "v";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+            Assert.IsTrue(eventFired);
+
+            eventFired = false;
+            editingAccount.UserId = "w";
+            Assert.IsTrue(finishCommand.CanExecute(null));
+            Assert.IsFalse(eventFired);
+
+            eventFired = false;
+            editingAccount.AccountName = "";
+            Assert.IsFalse(finishCommand.CanExecute(null));
+            Assert.IsTrue(eventFired);
+
+            eventFired = false;
+            editingAccount.UserId = "";
+            Assert.IsFalse(finishCommand.CanExecute(null));
+            Assert.IsFalse(eventFired);
         }
 
     }
